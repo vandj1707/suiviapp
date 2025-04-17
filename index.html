@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Suivi Applications</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border: 1px solid #ccc;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .progress-bar {
+      height: 20px;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background-color: #4caf50;
+      width: 0%;
+      transition: width 0.3s ease-in-out;
+    }
+    #exportBtn {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Suivi des applications</h2>
+<button id="exportBtn">📤 Exporter en Excel</button>
+
+<table id="appTable">
+  <thead>
+    <tr>
+      <th>Application</th>
+      <th>Ancien Répertoire AM vers KB</th>
+      <th>Report fichier Excel Vers KB</th>
+      <th>Transfert Ticket restant ALFRED</th>
+      <th>Progression</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+
+<script>
+  const apps = `3M Benchmark
+3M DRGfinder
+3P
+Accu-Chek Smart Pix
+AddHis
+AddHis Impressions et scan
+AddHis ITP
+AddHis TEL
+Adfinity
+Alertes Labo
+Alfred
+Allyn
+AMO
+Anesthesia
+Annuaire
+APO
+AppData
+Arim
+Atellica Solution
+Audiqueen
+AWServer
+AXI E-voting
+Bio-Rad
+Brainnet Software
+C2M
+Cardionics
+CardioRG
+Carl Source
+CCM
+Cellavision
+Centralink
+Channel
+Checkbox
+CHwapiBirthday
+ChwapiDisplay
+CHwapiGardes
+Cibes benchmark
+Cluster Low
+CM Partners
+Cobas 4800
+Cobas Infinity
+CobasIT (POC)
+Combolab
+ComeoCare
+Contrast&Care
+Core
+Custom Sound
+Darwin Holter
+Demandes Cardio
+Dexcom Clarity
+Diagnostic Manager
+Diamic
+Dicom Shuttle
+Dictation Manager
+DioWeb Me Deghoÿ et Bogaert-Dupont
+DI-RHM Web
+DMFA
+Doccle
+EarScreener
+eBulletin
+Echopac
+EcoFaDat
+EcoGUDID
+EcoMaDat
+EcoNoDat
+eDemande
+EFR
+eHealthBox
+ELISA
+Endobase
+Endoline
+Enterprise Archive
+eoDACS
+Epimed
+Epistore
+ERHMES
+eSirius
+Espace Collaborateurs
+ESview
+EtiPat_Wish
+Evénements Indésirables
+Evénements Indésirables (Lourd)
+Evénements Indésirables (Web)
+Exaline
+Exp'Air
+EZ Diablink
+EzPro
+Fidelo (Logistique)
+Finhosta
+Forum
+GemWeb
+Glucofacts DELUXE
+GlucoLog
+GreenPlayer
+HD4DP
+HD4DP v.2
+Helics
+Hemalink
+Hestia Système
+HLSetApp
+Hospimut Autoprint
+HR Access
+Hytrack
+iDoublons
+Image Vault
+Infectio Global
+Infectio Hygiène
+Innovian
+Intellispace Perinatal
+Interneo
+i-Stat
+itFix
+Javelo
+Jeebop EAI
+Kalilab
+Keypoint
+LFX
+LibreView
+LocMapping
+MacroPath
+MammoRIAS
+Mammorisk
+ManoScan
+ManoView
+MassLynx
+MIA
+MIM
+MMM
+Module DE
+Molis
+MPR
+MRQuantif
+myDiabby
+mySugr
+NicVue
+NotificationsCenter
+Novanet
+OB Tracevue
+Olea
+Omnipro DPI
+Omnipro RIS
+OneTouch Reveal
+Online Suite
+Ophtix
+ORLine
+OtoAccess
+PACSonWEB
+PEP Polypoint
+PEP-Pocket
+PharmGuard
+PHORESIS
+PIC
+PIC iX
+PillCam
+Pilot.Maldi
+Plateforme eHealth
+Plever
+PocManager
+ProVision
+PView
+Pyxis
+QUANTA Link
+RCM+
+Reflux
+Registre Donneurs
+Registre Santé
+Renalsoft
+RetroAct
+RoboScope
+Romexis
+Rotem live
+RPM
+RSW
+RTDisplay
+Rtest
+RTSoft Ultima
+SAE - Système d'Archivage Electronique
+Satis
+Seegen
+SentrySuite
+SMSend
+Spot Check Nihon Kohden
+SteriLine
+Synapselink
+Syngo.via
+Talent finder
+Tarsopnew
+T-DOC
+Telemis Home
+Telemis Microscopy
+Telemis Pacs
+Telemis Web
+Thalento
+The Essential Project
+Theo
+TransPat
+Transtech
+uConnect
+Unidose
+UNIGenda
+Universal Viewer
+Valab
+Ventana
+Venus
+Viking
+Vision
+Vitaprint
+VitaScan LT software
+Vitrea Vital
+VpnAdmin
+WI SCAN
+Wish
+Xaurum
+Xeleris
+Zan`.split("\n");
+
+  const tableBody = document.getElementById("tableBody");
+
+  apps.forEach((app, index) => {
+    const row = document.createElement("tr");
+
+    const appCell = document.createElement("td");
+    appCell.textContent = app;
+    row.appendChild(appCell);
+
+    for (let i = 0; i < 3; i++) {
+      const td = document.createElement("td");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      const storageKey = `app_${index}_cb${i}`;
+      checkbox.checked = localStorage.getItem(storageKey) === "true";
+      checkbox.addEventListener("change", () => {
+        localStorage.setItem(storageKey, checkbox.checked);
+        updateProgress(row, index);
+      });
+      td.appendChild(checkbox);
+      row.appendChild(td);
+    }
+
+    const progressTd = document.createElement("td");
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar";
+    const progressFill = document.createElement("div");
+    progressFill.className = "progress-bar-fill";
+    progressBar.appendChild(progressFill);
+    progressTd.appendChild(progressBar);
+    row.appendChild(progressTd);
+
+    tableBody.appendChild(row);
+    updateProgress(row, index);
+  });
+
+  function updateProgress(row, appIndex) {
+    const checkboxes = row.querySelectorAll("input[type='checkbox']");
+    const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+    const percent = Math.round((checkedCount / 3) * 100);
+    const fill = row.querySelector(".progress-bar-fill");
+    fill.style.width = `${percent}%`;
+  }
+
+  document.getElementById("exportBtn").addEventListener("click", () => {
+    let csvContent = "Application\tAM vers KB\tExcel vers KB\tTicket ALFRED\tProgression\n";
+    document.querySelectorAll("#appTable tbody tr").forEach((row, index) => {
+      const cells = row.querySelectorAll("td");
+      const app = cells[0].textContent;
+      const cb1 = cells[1].querySelector("input").checked ? "✅" : "❌";
+      const cb2 = cells[2].querySelector("input").checked ? "✅" : "❌";
+      const cb3 = cells[3].querySelector("input").checked ? "✅" : "❌";
+      const percent = cells[4].querySelector(".progress-bar-fill").style.width;
+      csvContent += `${app}\t${cb1}\t${cb2}\t${cb3}\t${percent}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "suivi_applications.xls");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+</script>
+
+</body>
+</html>
